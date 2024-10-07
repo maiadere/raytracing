@@ -5,20 +5,23 @@ use crate::{
 };
 
 pub struct Sphere {
-    pub center: Point3,
+    pub location: Point3,
     pub radius: f64,
 }
 
 impl Sphere {
     pub fn new(center: Point3, radius: f64) -> Sphere {
         let radius = radius.max(0.0);
-        Sphere { center, radius }
+        Sphere {
+            location: center,
+            radius,
+        }
     }
 }
 
 impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        let oc = self.center - ray.origin;
+        let oc = self.location - ray.origin;
         let a = ray.direction.norm_squared();
         let h = oc.dot(&ray.direction);
         let c = oc.norm_squared() - self.radius * self.radius;
@@ -40,7 +43,7 @@ impl Hittable for Sphere {
 
         let t = root;
         let origin = ray.at(t);
-        let normal = (origin - self.center) / self.radius;
+        let normal = (origin - self.location) / self.radius;
 
         Some(Hit::new(&ray, origin, normal, t))
     }
