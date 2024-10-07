@@ -1,3 +1,5 @@
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use rayon::slice::ParallelSliceMut;
 use raytracing::hit::Hittable;
 use raytracing::ray::Ray;
 use raytracing::scene::Scene;
@@ -5,8 +7,8 @@ use raytracing::sphere::Sphere;
 use raytracing::Color;
 use raytracing::{Point3, Vector3};
 
-const WIDTH: usize = 1920 / 2;
-const HEIGHT: usize = 1080 / 2;
+const WIDTH: usize = 1920;
+const HEIGHT: usize = 1080;
 const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
 
 fn trace_ray(scene: &Scene, ray: Ray) -> Color {
@@ -22,7 +24,9 @@ fn trace_ray(scene: &Scene, ray: Ray) -> Color {
 
 fn main() {
     let mut scene = Scene::new();
-    scene.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
+    scene.add(Sphere::new(Point3::new(0.0, 0.0, -2.0), 0.5));
+    scene.add(Sphere::new(Point3::new(1.5, 0.0, -2.0), 0.5));
+    scene.add(Sphere::new(Point3::new(-1.5, 0.0, -2.0), 0.5));
     scene.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
 
     let viewport_height = 2.0;
@@ -45,18 +49,21 @@ fn main() {
 
     let start_time = std::time::Instant::now();
 
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
+    buffer
+        .par_chunks_exact_mut(3)
+        .enumerate()
+        .for_each(|(i, pixel)| {
+            let y = i / WIDTH;
+            let x = i % WIDTH;
+
             let pixel_origin = first_pixel + x as f64 * pixel_delta_u + y as f64 * pixel_delta_v;
             let ray = Ray::new(camera_origin, pixel_origin - camera_origin);
             let color = trace_ray(&scene, ray);
 
-            let index = (y * WIDTH + x) * 3;
-            buffer[index] = color.red();
-            buffer[index + 1] = color.green();
-            buffer[index + 2] = color.blue();
-        }
-    }
+            pixel[0] = color.red();
+            pixel[1] = color.green();
+            pixel[2] = color.blue();
+        });
 
     println!("render time: {:?}", start_time.elapsed());
 

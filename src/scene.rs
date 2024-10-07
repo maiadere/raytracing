@@ -7,6 +7,9 @@ pub struct Scene {
     pub objects: Vec<Box<dyn Hittable>>,
 }
 
+unsafe impl Send for Scene {}
+unsafe impl Sync for Scene {}
+
 impl Scene {
     pub fn new() -> Scene {
         Scene {
