@@ -89,3 +89,18 @@ impl From<Vector3> for Color {
         Color::new(vector.x, vector.y, vector.z)
     }
 }
+
+pub mod random {
+    use std::cell::Cell;
+
+    thread_local! {
+        static RNG_STATE: Cell<u32> = const { Cell::new(0) };
+    }
+
+    pub fn rand_pcg() -> u32 {
+        let state = RNG_STATE.get();
+        RNG_STATE.set(state * 747796405 + 2891336453);
+        let word = ((state >> ((state >> 28) + 4)) ^ state) * 277803737;
+        return (word >> 22) ^ word;
+    }
+}
