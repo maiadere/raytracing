@@ -1,7 +1,9 @@
+pub mod camera;
 pub mod hit;
 pub mod ray;
 pub mod scene;
 pub mod sphere;
+pub mod viewport;
 
 pub type Point3 = nalgebra::Point3<f64>;
 pub type Vector3 = nalgebra::Vector3<f64>;
@@ -27,6 +29,10 @@ impl Color {
 
     pub fn blue(&self) -> u8 {
         (255.0 * self.b) as u8
+    }
+
+    pub fn bytes(&self) -> [u8; 3] {
+        [self.red(), self.green(), self.blue()]
     }
 
     pub fn lerp(&self, other: &Color, t: f64) -> Color {
