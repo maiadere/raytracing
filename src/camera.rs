@@ -57,7 +57,7 @@ fn trace_ray(scene: &Scene, ray: Ray, depth: usize) -> Color {
         return Color::new(0.0, 0.0, 0.0);
     }
 
-    if let Some(hit) = scene.hit(&ray, 0.0, f64::INFINITY) {
+    if let Some(hit) = scene.hit(&ray, 0.001, f64::INFINITY) {
         let dir = Vector3::random_on_hemisphere(&hit.normal);
         return 0.5 * trace_ray(&scene, Ray::new(hit.origin, dir), depth - 1);
     }
