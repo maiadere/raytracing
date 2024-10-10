@@ -6,8 +6,8 @@ use rayon::{
 use std::ops::Div;
 
 use crate::{
-    hit::Hittable, random::Random, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3,
-    Vector3,
+    color::Color, hit::Hittable, random::Random, ray::Ray, scene::Scene, viewport::Viewport,
+    Point3, Vector3,
 };
 
 pub struct Camera {
@@ -44,10 +44,10 @@ impl Camera {
                         trace_ray(&scene, ray, self.max_bounces)
                     })
                     .sum::<Color>()
-                    .div(self.samples_per_pixel as f64)
-                    .bytes();
+                    .div(self.samples_per_pixel as f64);
 
-                pixel.copy_from_slice(&(color));
+                let color = color.clamp(0.0, f64::INFINITY).pow(1.0 / 2.2);
+                pixel.copy_from_slice(&color.bytes());
             });
     }
 }
