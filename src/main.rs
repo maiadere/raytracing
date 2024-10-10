@@ -6,7 +6,8 @@ use raytracing::Point3;
 
 const WIDTH: usize = 1920;
 const HEIGHT: usize = 1080;
-const SAMPLES_PER_PIXEL: usize = 8;
+const SAMPLES_PER_PIXEL: usize = 16;
+const MAX_BOUNCES: usize = 4;
 
 fn main() {
     let mut buffer = vec![0u8; WIDTH * HEIGHT * 3];
@@ -17,7 +18,12 @@ fn main() {
     scene.add(Sphere::new(Point3::new(-1.5, 0.0, -2.0), 0.5));
     scene.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
 
-    let camera = Camera::new(Point3::new(0.0, 0.0, 0.0), 1.0, SAMPLES_PER_PIXEL);
+    let camera = Camera::new(
+        Point3::new(0.0, 0.0, 0.0),
+        1.0,
+        SAMPLES_PER_PIXEL,
+        MAX_BOUNCES,
+    );
     let viewport = Viewport::new(WIDTH, HEIGHT, &camera);
 
     let start_time = std::time::Instant::now();

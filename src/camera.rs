@@ -5,20 +5,30 @@ use rayon::{
 
 use std::ops::Div;
 
-use crate::{hit::Hittable, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3};
+use crate::{
+    hit::Hittable, random::RandomVector3, ray::Ray, scene::Scene, viewport::Viewport, Color,
+    Point3, Vector3,
+};
 
 pub struct Camera {
     pub location: Point3,
     pub focal_length: f64,
     pub samples_per_pixel: usize,
+    pub max_bounces: usize,
 }
 
 impl Camera {
-    pub fn new(location: Point3, focal_length: f64, samples_per_pixel: usize) -> Camera {
+    pub fn new(
+        location: Point3,
+        focal_length: f64,
+        samples_per_pixel: usize,
+        max_bounces: usize,
+    ) -> Camera {
         Camera {
             location,
             focal_length,
             samples_per_pixel,
+            max_bounces,
         }
     }
 
@@ -31,7 +41,7 @@ impl Camera {
                     .map(|_| {
                         let target = viewport.get_pixel_location(i);
                         let ray = Ray::new(self.location, target - self.location);
-                        trace_ray(&scene, ray)
+                        trace_ray(&scene, ray, self.max_bounces)
                     })
                     .sum::<Color>()
                     .div(self.samples_per_pixel as f64)
@@ -42,9 +52,14 @@ impl Camera {
     }
 }
 
-fn trace_ray(scene: &Scene, ray: Ray) -> Color {
+fn trace_ray(scene: &Scene, ray: Ray, depth: usize) -> Color {
+    if depth == 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
     if let Some(hit) = scene.hit(&ray, 0.0, f64::INFINITY) {
-        return 0.5 * (Color::from(hit.normal) + Color::new(1.0, 1.0, 1.0));
+        let dir = Vector3::random_on_hemisphere(&hit.normal);
+        return 0.5 * trace_ray(&scene, Ray::new(hit.origin, dir), depth - 1);
     }
 
     let unit_direction = ray.direction.normalize();
