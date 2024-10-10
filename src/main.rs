@@ -1,5 +1,4 @@
 use raytracing::camera::Camera;
-use raytracing::random::rand_pcg;
 use raytracing::scene::Scene;
 use raytracing::sphere::Sphere;
 use raytracing::viewport::Viewport;

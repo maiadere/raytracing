@@ -97,10 +97,25 @@ pub mod random {
         static RNG_STATE: Cell<u32> = const { Cell::new(0) };
     }
 
-    pub fn rand_pcg() -> u32 {
+    fn rand_pcg() -> u32 {
         let state = RNG_STATE.get();
         RNG_STATE.set(state * 747796405 + 2891336453);
         let word = ((state >> ((state >> 28) + 4)) ^ state) * 277803737;
         return (word >> 22) ^ word;
+    }
+
+    pub trait Random {
+        fn random() -> Self;
+        fn random_in_range(min: Self, max: Self) -> Self;
+    }
+
+    impl Random for f64 {
+        fn random() -> Self {
+            rand_pcg() as Self / u32::MAX as Self
+        }
+
+        fn random_in_range(min: Self, max: Self) -> Self {
+            min + (max - min) * Self::random()
+        }
     }
 }

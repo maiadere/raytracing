@@ -3,7 +3,7 @@ use rayon::{
     slice::ParallelSliceMut,
 };
 
-use crate::{hit::Hittable, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3, Vector3};
+use crate::{hit::Hittable, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3};
 
 pub struct Camera {
     pub location: Point3,
