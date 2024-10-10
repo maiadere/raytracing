@@ -1,4 +1,6 @@
 use raytracing::camera::Camera;
+use raytracing::color::Color;
+use raytracing::material::Material;
 use raytracing::scene::Scene;
 use raytracing::sphere::Sphere;
 use raytracing::viewport::Viewport;
@@ -13,10 +15,35 @@ fn main() {
     let mut buffer = vec![0u8; WIDTH * HEIGHT * 3];
 
     let mut scene = Scene::new();
-    scene.add(Sphere::new(Point3::new(0.0, 0.0, -2.0), 0.5));
-    scene.add(Sphere::new(Point3::new(1.5, 0.0, -2.0), 0.5));
-    scene.add(Sphere::new(Point3::new(-1.5, 0.0, -2.0), 0.5));
-    scene.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
+    scene.add(Sphere::new(
+        Point3::new(0.0, 0.0, -2.0),
+        0.5,
+        Material {
+            albedo: Color::new(1.0, 0.2, 0.2),
+            metallic: 0.8,
+        },
+    ));
+    scene.add(Sphere::new(
+        Point3::new(1.5, 0.0, -2.0),
+        0.5,
+        Material {
+            albedo: Color::new(0.2, 1.0, 0.2),
+            metallic: 0.8,
+        },
+    ));
+    scene.add(Sphere::new(
+        Point3::new(-1.5, 0.0, -2.0),
+        0.5,
+        Material {
+            albedo: Color::new(0.2, 0.2, 1.0),
+            metallic: 0.8,
+        },
+    ));
+    scene.add(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        Material::default(),
+    ));
 
     let camera = Camera::new(
         Point3::new(0.0, 0.0, 0.0),

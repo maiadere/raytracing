@@ -1,4 +1,4 @@
-use crate::{ray::Ray, Point3, Vector3};
+use crate::{material::Material, ray::Ray, Point3, Vector3};
 
 #[derive(Debug, Clone)]
 pub struct Hit {
@@ -6,10 +6,11 @@ pub struct Hit {
     pub normal: Vector3,
     pub t: f64,
     pub front_face: bool,
+    pub material: Material,
 }
 
 impl Hit {
-    pub fn new(ray: &Ray, origin: Point3, normal: Vector3, t: f64) -> Hit {
+    pub fn new(ray: &Ray, origin: Point3, normal: Vector3, t: f64, material: Material) -> Hit {
         let front_face = normal.dot(&ray.direction) < 0.0;
         let normal = if front_face { normal } else { -normal };
         Hit {
@@ -17,6 +18,7 @@ impl Hit {
             normal,
             t,
             front_face,
+            material,
         }
     }
 }

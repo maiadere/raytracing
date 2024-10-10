@@ -2,6 +2,7 @@ use std::iter::Sum;
 
 use crate::Vector3;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Color {
     pub r: f64,
     pub g: f64,

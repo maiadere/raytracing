@@ -1,5 +1,6 @@
 use crate::{
     hit::{Hit, Hittable},
+    material::Material,
     ray::Ray,
     Point3,
 };
@@ -7,14 +8,16 @@ use crate::{
 pub struct Sphere {
     pub location: Point3,
     pub radius: f64,
+    pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Sphere {
+    pub fn new(center: Point3, radius: f64, material: Material) -> Sphere {
         let radius = radius.max(0.0);
         Sphere {
             location: center,
             radius,
+            material,
         }
     }
 }
@@ -45,6 +48,6 @@ impl Hittable for Sphere {
         let origin = ray.at(t);
         let normal = (origin - self.location) / self.radius;
 
-        Some(Hit::new(&ray, origin, normal, t))
+        Some(Hit::new(&ray, origin, normal, t, self.material))
     }
 }

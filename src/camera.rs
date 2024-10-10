@@ -58,8 +58,11 @@ fn trace_ray(scene: &Scene, ray: Ray, depth: usize) -> Color {
     }
 
     if let Some(hit) = scene.hit(&ray, 0.001, f64::INFINITY) {
-        let dir = hit.normal + Vector3::random();
-        return 0.5 * trace_ray(&scene, Ray::new(hit.origin, dir), depth - 1);
+        // let dir = hit.normal + Vector3::random();
+        // return 0.5 * trace_ray(&scene, Ray::new(hit.origin, dir), depth - 1);
+        if let Some(scattered) = hit.material.scatter(&ray, &hit) {
+            return scattered.attenuation * trace_ray(&scene, scattered.ray, depth - 1);
+        }
     }
 
     let unit_direction = ray.direction.normalize();
