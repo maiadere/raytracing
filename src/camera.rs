@@ -6,8 +6,8 @@ use rayon::{
 use std::ops::Div;
 
 use crate::{
-    hit::Hittable, random::RandomVector3, ray::Ray, scene::Scene, viewport::Viewport, Color,
-    Point3, Vector3,
+    hit::Hittable, random::Random, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3,
+    Vector3,
 };
 
 pub struct Camera {
@@ -58,7 +58,7 @@ fn trace_ray(scene: &Scene, ray: Ray, depth: usize) -> Color {
     }
 
     if let Some(hit) = scene.hit(&ray, 0.001, f64::INFINITY) {
-        let dir = Vector3::random_on_hemisphere(&hit.normal);
+        let dir = hit.normal + Vector3::random();
         return 0.5 * trace_ray(&scene, Ray::new(hit.origin, dir), depth - 1);
     }
 
