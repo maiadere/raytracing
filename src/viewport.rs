@@ -1,3 +1,4 @@
+use crate::random::RandomInRange;
 use crate::{camera::Camera, Point3, Vector3};
 
 pub struct Viewport {
@@ -38,8 +39,8 @@ impl Viewport {
     }
 
     pub fn get_pixel_location(&self, i: usize) -> Point3 {
-        let x = self.pixel_offset.x * (i % self.row_pitch) as f64;
-        let y = self.pixel_offset.y * (i / self.row_pitch) as f64;
-        self.first_pixel + Vector3::new(x, y, 0.0)
+        let x = (i % self.row_pitch) as f64 + f64::random_in_range(-0.5, 0.5);
+        let y = (i / self.row_pitch) as f64 + f64::random_in_range(-0.5, 0.5);
+        self.first_pixel + Vector3::new(self.pixel_offset.x * x, self.pixel_offset.y * y, 0.0)
     }
 }

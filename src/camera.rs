@@ -3,18 +3,22 @@ use rayon::{
     slice::ParallelSliceMut,
 };
 
+use std::ops::Div;
+
 use crate::{hit::Hittable, ray::Ray, scene::Scene, viewport::Viewport, Color, Point3};
 
 pub struct Camera {
     pub location: Point3,
     pub focal_length: f64,
+    pub samples_per_pixel: usize,
 }
 
 impl Camera {
-    pub fn new(location: Point3, focal_length: f64) -> Camera {
+    pub fn new(location: Point3, focal_length: f64, samples_per_pixel: usize) -> Camera {
         Camera {
             location,
             focal_length,
+            samples_per_pixel,
         }
     }
 
@@ -23,10 +27,17 @@ impl Camera {
             .par_chunks_exact_mut(3)
             .enumerate()
             .for_each(|(i, pixel)| {
-                let target = viewport.get_pixel_location(i);
-                let ray = Ray::new(self.location, target - self.location);
-                let color = trace_ray(&scene, ray);
-                pixel.copy_from_slice(&color.bytes());
+                let color = (0..self.samples_per_pixel)
+                    .map(|_| {
+                        let target = viewport.get_pixel_location(i);
+                        let ray = Ray::new(self.location, target - self.location);
+                        trace_ray(&scene, ray)
+                    })
+                    .sum::<Color>()
+                    .div(self.samples_per_pixel as f64)
+                    .bytes();
+
+                pixel.copy_from_slice(&(color));
             });
     }
 }
